@@ -1,7 +1,0 @@
-# CMake artifacts, etc.
-build
-cmake-build-debug
-cmake-build-release
-
-# Model exports
-*.obj

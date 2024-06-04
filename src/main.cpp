@@ -34,7 +34,7 @@ glm::mat4 arcball_camera_matrix = glm::lookAt(glm::vec3{ 6.0f, 1.0f, 0.0f }, glm
 glm::mat4 arcball_model_matrix = glm::mat4{ 1.0f };
 
 // Global settings
-size_t number_of_fibers = 200;
+size_t number_of_fibers = 2;
 size_t iterations_per_fiber = 300;
 const std::vector<std::string> modes = { "Great Circle", "Random", "Loxodrome", "Curl" };
 std::string current_mode = modes[3];
@@ -50,12 +50,12 @@ uint32_t seed = 0;                                          // For mode: "Random
 float mean = 0.0f;                                          // For mode: "Random"
 float standard_deviation = 1.0f;                            // For mode: "Random"
 float loxodrome_offset = 2.0f;                              // For mode: "Loxodrome"
-float curl_alpha = 4.0f;                                    // For mode: "Curl"                         
+float curl_alpha = 1.0f;                                    // For mode: "Curl"
 float curl_beta = 0.5f;                                     // For mode: "Curl"
 
 // Appearance and export settings
 static char filename[64] = "Hopf.obj";
-ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);   
+ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 bool show_floor_plane = true;
 bool draw_as_points = false;
 bool display_shadows = true;
@@ -101,12 +101,12 @@ void key_callback(GLFWwindow* window, int key, int scancode, int action, int mod
 }
 
 /**
- * Get a normalized vector from the center of a virtual sphere centered at the origin to 
- * a point `point_on_sphere` on the virtual ball surface, such that `point_on_sphere` 
+ * Get a normalized vector from the center of a virtual sphere centered at the origin to
+ * a point `point_on_sphere` on the virtual ball surface, such that `point_on_sphere`
  * is aligned on screen's (x, y) coordinates.  If (x, y) is too far away from the
  * sphere, return the nearest point on the virtual ball surface.
  */
-glm::vec3 get_arcball_vector(int x, int y) 
+glm::vec3 get_arcball_vector(int x, int y)
 {
     auto point_on_sphere = glm::vec3{
         1.0f * x / window_w * 2.0f - 1.0f,
@@ -425,7 +425,7 @@ namespace hopf
                 };
 
                 vertices.push_back(vertex);
-                indices.push_back(j + iterations_per_fiber * i);
+                indices.push_back(j + iterations_per_fiber *i );
             }
 
             // Primitive restart
@@ -446,7 +446,7 @@ int main()
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, false);
     glfwWindowHint(GLFW_SAMPLES, 4);
-    GLFWwindow* window = glfwCreateWindow(window_w, window_h, "Hopf Fibration", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(window_w, window_h, "Walk the Talk!", nullptr, nullptr);
 
     if (window == nullptr)
     {
@@ -470,6 +470,7 @@ int main()
     
     // Initialize ImGui
     IMGUI_CHECKVERSION();
+std::cout << "cooll" << std::endl;
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO(); (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; 
@@ -477,6 +478,7 @@ int main()
     ImGui_ImplGlfw_InitForOpenGL(window, true);
     ImGui_ImplOpenGL3_Init("#version 460");
 
+std::cout << "cool 2" << std::endl;
     // Setup initial OpenGL state
     {
 #if defined(_DEBUG)
@@ -503,6 +505,7 @@ int main()
         glCullFace(GL_BACK);
     }
 
+std::cout << "cool 3" << std::endl;
     // Load shader programs
     auto shader_depth = graphics::Shader{ "../shaders/depth.vert", "../shaders/depth.frag" };
     auto shader_hopf = graphics::Shader{ "../shaders/hopf.vert", "../shaders/hopf.frag" };
@@ -592,13 +595,15 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
         {
+
+std::cout << "cool 4" << std::endl;
             // Container #1: settings 
             {
                 ImGui::Begin("Hopf Fibration");
 
                 // Global settings (shared across modes)
                 ImGui::TextColored(ImGui::GetStyleColorVec4(ImGuiCol_PlotHistogram), "Primary Controls");
-                topology_needs_update |= ImGui::SliderInt("Number of Fibers", (int*)&number_of_fibers, 1, 1000);
+                topology_needs_update |= ImGui::SliderInt("Number of Fibers", (int*)&number_of_fibers, 1, 250);
                 topology_needs_update |= ImGui::SliderInt("Iterations per Fibers", (int*)&iterations_per_fiber, 10, 500);
                 ImGui::Text("Total Vertices: %d", number_of_fibers * iterations_per_fiber);
                 if (ImGui::BeginCombo("Mode", current_mode.c_str())) 
@@ -663,7 +668,7 @@ int main()
                 }
                 else if (current_mode == "Curl")
                 {
-                    topology_needs_update |= ImGui::SliderFloat("Curl Alpha", &curl_alpha, 4.0f, 10.0f);
+                    topology_needs_update |= ImGui::SliderFloat("Curl Alpha", &curl_alpha, 1.0f, 10.0f);
                     topology_needs_update |= ImGui::SliderFloat("Curl Beta", &curl_beta, 0.0f, 1.0f);
                 }
 
@@ -676,38 +681,58 @@ int main()
                 topology_needs_update |= ImGui::SliderFloat("Rotation Z", &rotation_z, 0.0f, glm::pi<float>());
 
                 ImGui::End();
+
+std::cout << "cool 5" << std::endl;
             }
             // Container #2: preview UI
             {
+
+std::cout << "cool 5.6" << std::endl;
                 ImGui::Begin("Mapping (Points on S2)");
+
+std::cout << "cool 5.7" << std::endl;
                 ImGui::Image((void*)(intptr_t)texture_ui, ImVec2(ui_w, ui_h), ImVec2(1, 1), ImVec2(0, 0));
+
+std::cout << "cool 5.08" << std::endl;
                 ImGui::End();
             }
             // Container #3: appearance and export
             {
+
+std::cout << "cool 5.09" << std::endl;
                 ImGui::Begin("Appearance and Export");
-                ImGui::InputText("", filename, 64);
+                ImGui::InputText("f", filename, 64);
                 ImGui::SameLine();
                 if (ImGui::Button("Export"))
                 {
+
+std::cout << "cool 5.0" << std::endl;
                     utils::save_polyline_obj(mesh_hopf, filename);
                 }
+
+std::cout << "cool 5.1" << std::endl;
                 ImGui::ColorEdit3("Background Color", (float*)&clear_color);
                 ImGui::Checkbox("Show Floor Plane", &show_floor_plane);
                 ImGui::Checkbox("Draw as Points (Instead of Lines)", &draw_as_points);
                 ImGui::Checkbox("Display Shadows", &display_shadows);
                 ImGui::SliderFloat("Line Width", &line_width, 1.0f, 10.0f);
 
+std::cout << "cool 5.2" << std::endl;
                 ImGui::Separator();
 
+std::cout << "cool 5.3" << std::endl;
                 // Some statistics about framerate, etc.
                 ImGui::Text("Application Average %.3f MS/Frame (%.1f FPS)", 1000.0f / ImGui::GetIO().Framerate, ImGui::GetIO().Framerate);
 
+std::cout << "cool 5.4" << std::endl;
                 ImGui::End();
             }
         }
+
+std::cout << "cool 5.5" << std::endl;
         ImGui::Render();
 
+std::cout << "cool 6" << std::endl;
         // The transformation matrix that will be applied to the base points on S2 to generate the fibration
         glm::mat4 ui_rotation_matrix{ 1.0f };
         ui_rotation_matrix = glm::rotate(ui_rotation_matrix, rotation_x, glm::vec3{ 1.0f, 0.0f, 0.0f });
@@ -769,7 +794,8 @@ int main()
         // Render 3D objects to default framebuffer
         {
             glLineWidth(line_width);
-         
+
+std::cout << "cool 7" << std::endl;
             glm::vec3 light_position{ -2.0f, 2.0f, 2.0f };
             const float near_plane = 0.0f;
             const float far_plane = 7.5f;

@@ -195,8 +195,8 @@ namespace graphics
                 GLsizei count = 0;
                 GLenum type = GL_NONE;
                 glGetProgramiv(program_id, GL_ACTIVE_UNIFORM_MAX_LENGTH, &max_name_len);
-
-                auto uniform_name = std::make_unique<char[]>(max_name_len);
+                std::unique_ptr<char[]> uniform_name(new char[max_name_len]);
+                //auto uniform_name = std::make_unique<char[]>(max_name_len);
 
                 std::unordered_map<std::string, UniformEntry> uniforms;
 
